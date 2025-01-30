@@ -16,7 +16,7 @@ export const EntryProvider = ({ children }) => {
 
   //---> TAGS
   useEffect(() => {
-    fetch("http://localhost:5000/tags", {
+    fetch("https://online-journal-45oh.onrender.com/tags", {
       method: "GET",
       headers: {
         "Content-type": "application/json",
@@ -32,7 +32,7 @@ export const EntryProvider = ({ children }) => {
 
   // Fetch Entry
   useEffect(() => {
-    fetch("http://localhost:5000/entries", {
+    fetch("https://online-journal-45oh.onrender.com/entries", {
       method: "GET",
       headers: {
         "Content-type": "application/json",
@@ -48,7 +48,7 @@ export const EntryProvider = ({ children }) => {
   // Add Entry
   const addEntry = (title, content, tag_id) => {
     alert("Adding entry...");
-    fetch("http://localhost:5000/entry/add", {
+    fetch("https://online-journal-45oh.onrender.com/entry/add", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -79,7 +79,7 @@ export const EntryProvider = ({ children }) => {
 
   const updateEntry = (entry_id, updatedTitle, updatedContent) => {
     alert("Updating entry...");
-    fetch(`http://localhost:5000/entry/${entry_id}`, {
+    fetch(`https://online-journal-45oh.onrender.com/entry/${entry_id}`, {
       method: "PATCH",
       headers: {
         "Content-type": "application/json",
@@ -110,7 +110,7 @@ export const EntryProvider = ({ children }) => {
   // ---> Delete an entry
   const deleteEntry = (id) => {
     alert("Deleting entry...");
-    fetch(`http://localhost:5000/entry/${id}`, {
+    fetch(`https://online-journal-45oh.onrender.com/entry/${id}`, {
       method: "DELETE",
       headers: {
         "Content-type": "application/json",
