@@ -17,13 +17,13 @@ Before you open our code, make sure to:
 
 ## Core Features
 
-Register and Login
-Can add an entry
-Can update an entry
-Can delete an entry
-Can update their profile
-Can view all their entries which are sorted by date created
-Can logout
+- Register and Login
+- Can add an entry
+- Can update an entry
+- Can delete an entry
+- Can update their profile
+- Can view all their entries which are sorted by date created
+- Can logout
 
 ## Usage
 
@@ -40,7 +40,7 @@ ReactJS, GIT, RENDER, VERCEL, CSS, Python, FlaskSQLAlchemy
 ## Live server
 
 To view how the website looks like, please, click the link below that will direct you to the journal
-(Link)
+(Link) => https://journal-final-eta.vercel.app/
 
 ## Support and contact details
 
