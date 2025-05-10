@@ -37,7 +37,7 @@ class Entry(db.Model):
 
     # Adding a foreign key to User
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    tag_id =  db.Column(db.Integer, db.ForeignKey("tags.id"), nullable=False)
+    tag_id =  db.Column(db.Integer, db.ForeignKey("tags.id"), nullable=True)
 
 # ---> ADDING A TOKEN BLOCKLIST WHEN A USER LOGS OUT
 class TokenBlocklist(db.Model):

@@ -9,9 +9,9 @@ app = Flask(__name__)
 
 CORS(app)
 
-# CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5173"}})
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///journal.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://online_journaldb_user:OwpfjfMuA4eD3SYAzBOMPE6nQJwBApNk@dpg-d0fh4gk9c44c73bc4jkg-a.oregon-postgres.render.com/online_journaldb'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://journaldb_yhyb_user:GNAvEEd2C95fBit2egzCe7mBZLUwL62B@dpg-cudtb1hopnds73clr3mg-a.oregon-postgres.render.com/journaldb_yhyb'
 migrate = Migrate(app, db)
 db.init_app(app)
 

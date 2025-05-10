@@ -5,33 +5,30 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 entry_bp = Blueprint("entry_bp", __name__)
 
-# ---> CREATING THE CRUD FUNCTIONS
-
 # ---> Fetch all entries
 @entry_bp.route("/entries", methods=["GET"])
 @jwt_required()
-def fetch_products(): 
-
-    # ---> Fetching all tentries in the db
-
+def fetch_products():
     current_user_id = get_jwt_identity()
-
-    entries = Entry.query.filter_by(user_id = current_user_id)
+    entries = Entry.query.filter_by(user_id=current_user_id)
 
     entry_list = []
     for entry in entries:
-        entry_list.append({
+        entry_data = {
             'id': entry.id,
             'title': entry.title,
             'content': entry.content,
             'date_created': entry.date_created,
             'date_updated': entry.date_updated,
-            "user": {"id":entry.user.id, "name": entry.user.name, "email": entry.user.email},
-            "tag": {"id": entry.tag.id, "name":entry.tag.name}
-        })
+            "user": {"id": entry.user.id, "name": entry.user.name, "email": entry.user.email}
+        }
+        if entry.tag:  # Only include tag if it exists
+            entry_data["tag"] = {"id": entry.tag.id, "name": entry.tag.name}
+        entry_list.append(entry_data)
+    
     return jsonify(entry_list)
 
-# ---> add an entry
+# ---> Add an entry (now with optional tag)
 @entry_bp.route("/entry/add", methods=["POST"])
 @jwt_required()
 def add_entry():
@@ -40,104 +37,89 @@ def add_entry():
 
     title = data["title"]
     content = data['content']
+    # -----> make it optional
+    tag_id = data.get('tag_id')  
 
-    #---> added a user id because it wasn't working without it and it was saying NULL 
-    tag_id = data.get('tag_id') 
+    # ----> Check if entry title exists
+    if Entry.query.filter_by(title=title, user_id=current_user_id).first():
+        return jsonify({"error": "Entry title already exists"}), 400
 
-    # ---> Check if the entry title already exists
-    check_title = Entry.query.filter_by(title=title).first()
-    check_tag_id = Tags.query.get(tag_id)
-
-    if check_title:
-        return jsonify({"error": "Entry already exists"}), 400
-    
-    if not check_tag_id:
-        return jsonify({"error":"Tag/user doesn't exists"}),406
-    
-    # if not user_id:
-    #     return jsonify({"error": "User ID is required"}), 400
-
-    # ----> Create a new entry and associate it with the user
-    new_entry = Entry(title=title, content=content, user_id=current_user_id, tag_id=tag_id)
+    # ----> Create entry 
+    new_entry = Entry(
+        title=title,
+        content=content,
+        user_id=current_user_id,
+        tag_id=tag_id if tag_id else None
+    )
     
     db.session.add(new_entry)
     db.session.commit()
 
-    return jsonify({"success": "Added successfully"}), 201
+    return jsonify({"success": "Entry added successfully"}), 201
 
 # ---> GET entry BY ID
 @entry_bp.route("/entry/<int:entry_id>", methods=["GET"])
 @jwt_required()
 def get_entry(entry_id):
     current_user_id = get_jwt_identity()
-
     entry = Entry.query.filter_by(id=entry_id, user_id=current_user_id).first()
-    if entry:
-        entry_details = {
-            "id": entry.id,
-            "title": entry.title,
-            "content": entry.content,
-            "user_id": entry.user_id,
-            "tag_id": entry.tag_id
-        }
-        return jsonify(entry_details), 200
+
+    if not entry:
+        return jsonify({"error": "Entry not found"}), 404
+
+    response = {
+        "id": entry.id,
+        "title": entry.title,
+        "content": entry.content,
+        "user_id": entry.user_id
+    }
     
-    else:
-        return jsonify({"error": "Entry not found"}), 406
+    if entry.tag:
+        response["tag_id"] = entry.tag_id
+        response["tag_name"] = entry.tag.name
+        
+    return jsonify(response), 200
 
 # ---> Update an entry 
 @entry_bp.route("/entry/<int:entry_id>", methods=["PATCH"])
 @jwt_required()
 def update_entry(entry_id):
     current_user_id = get_jwt_identity()
-
-    data = request.get_json()
     entry = Entry.query.get(entry_id)
 
-    # Check if the entry exists
-    if entry is None:
+    if not entry:
         return jsonify({"error": "Entry doesn't exist!"}), 404
 
-    # Check if the entry belongs to the current user
-    if entry.user_id == current_user_id:
-        return jsonify({"error": "You don't have permission to edit this entry"}), 403
+    if entry.user_id != current_user_id:
+        return jsonify({"error": "Unauthorized"}), 403
 
+    data = request.get_json()
     title = data.get('title', entry.title)
     content = data.get('content', entry.content)
-    tag_id = data.get('tag_id', entry.tag_id)
-    updated_at = datetime.now(timezone.utc)  # Force update
+    tag_id = data.get('tag_id', entry.tag_id)  
 
-    # Check if the title already exists, excluding the current entry
-    check_title = Entry.query.filter(Entry.title == title, Entry.id != entry_id).first()
+    # ------> Check for duplicate title 
+    if Entry.query.filter(Entry.title == title, Entry.id != entry_id, Entry.user_id == current_user_id).first():
+        return jsonify({"error": "Title already exists"}), 400
 
-    if check_title:
-        return jsonify({"error": "Entry title already exists"}), 406
-
-    # Update the entry
     entry.title = title
     entry.content = content
-    entry.tag_id = tag_id
-    entry.date_updated = updated_at
+    entry.tag_id = tag_id if tag_id else None
+    entry.date_updated = datetime.now(timezone.utc)
 
     db.session.commit()
-    return jsonify({"success": "Updated successfully"}), 200
+    return jsonify({"success": "Entry updated"}), 200
 
-
-
-# ---> delete an entry
+# ---> Delete an entry 
 @entry_bp.route("/entry/<int:entry_id>", methods=["DELETE"])
 @jwt_required()
 def delete_entry(entry_id):
     current_user_id = get_jwt_identity()
-
     entry = Entry.query.filter_by(id=entry_id, user_id=current_user_id).first()
 
     if not entry:
-        return jsonify({"error": "Entry not found"})
+        return jsonify({"error": "Entry not found"}), 404
         
     db.session.delete(entry)
     db.session.commit()
-    return jsonify({"success": "Deleted successfully"})
-    
-   
-
+    return jsonify({"success": "Entry deleted"}), 200
