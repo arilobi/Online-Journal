@@ -16,7 +16,7 @@ export const EntryProvider = ({ children }) => {
 
   //---> TAGS
   useEffect(() => {
-    fetch("https://online-journal-45oh.onrender.com/tags", {
+    fetch("http://127.0.0.1:5000/tags", {
       method: "GET",
       headers: {
         "Content-type": "application/json",
@@ -32,7 +32,7 @@ export const EntryProvider = ({ children }) => {
 
   // Fetch Entry
   useEffect(() => {
-    fetch("https://online-journal-45oh.onrender.com/entries", {
+    fetch("http://127.0.0.1:5000/entries", {
       method: "GET",
       headers: {
         "Content-type": "application/json",
@@ -48,7 +48,7 @@ export const EntryProvider = ({ children }) => {
   // Add Entry
   const addEntry = (title, content, tag_id) => {
     alert("Adding entry...");
-    fetch("https://online-journal-45oh.onrender.com/entry/add", {
+    fetch("http://127.0.0.1:5000/entry/add", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -79,7 +79,7 @@ export const EntryProvider = ({ children }) => {
 
   const updateEntry = (entry_id, updatedTitle, updatedContent) => {
     alert("Updating entry...");
-    fetch(`https://online-journal-45oh.onrender.com/entry/${entry_id}`, {
+    fetch(`http://127.0.0.1:5000/entry/${entry_id}`, {
       method: "PATCH",
       headers: {
         "Content-type": "application/json",
@@ -94,8 +94,8 @@ export const EntryProvider = ({ children }) => {
       .then((response) => {
         if (response.success) {
           alert(response.success);
-          setOnChange(!onChange); //---> updating the state
-          navigate("/"); // ---> Redirect after successful update
+          setOnChange(!onChange); 
+          navigate("/");
         } else if (response.error) {
           alert(response.error);
         } else {
@@ -110,7 +110,7 @@ export const EntryProvider = ({ children }) => {
   // ---> Delete an entry
   const deleteEntry = (id) => {
     alert("Deleting entry...");
-    fetch(`https://online-journal-45oh.onrender.com/entry/${id}`, {
+    fetch(`http://127.0.0.1:5000/entry/${id}`, {
       method: "DELETE",
       headers: {
         "Content-type": "application/json",

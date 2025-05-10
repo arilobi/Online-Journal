@@ -2,6 +2,7 @@
 body {
   background-color: #F2EFE5;
   margin: 0;
+  
 }
 
 /* -----------------------------------Navbar---------------------------------- */
@@ -236,7 +237,7 @@ button:hover {
 
 .entry-home {
   margin: 20px;
-  height: 400px;
+  min-height: 100vh;
 }
 
 .entry-home h1 {
@@ -388,6 +389,7 @@ button:hover {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 40px;
+  min-height: 50vh;
 }
 
 .profile img {
@@ -753,6 +755,7 @@ button:hover {
   margin-bottom: 170px;
   padding-left: 100px;
   padding-right: 100px;
+  min-height: 35vh;
 }
 
 .about p {
